@@ -1,0 +1,40 @@
+Vagrant.configure("2") do |config|
+	config.vm.network "forwarded_port", guest: 8080, host: 8080
+	#config.vm.box = "centos/7"
+	config.vm.box = "geerlingguy/centos7"
+	config.ssh.insert_key = false
+	config.ssh.forward_agent = true
+	# Disable foler sync
+	config.vm.synced_folder ".", "/vagrant", disabled: true
+	# Don't install guest additions
+	config.vbguest.auto_update = false
+
+  config.vm.provider "virtualbox" do |vb|
+    #vb.gui = true
+    vb.name = "jenkins"
+    #vb.network :private_network, ip: "192.168.33.101"
+    vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+    vb.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+    vb.customize ['modifyvm', :id, '--memory', '512', '--ioapic', 'on']
+	vb.customize ["modifyvm", :id, "--hwvirtex", "on"]
+     # vb.customize ["modifyvm", :id, "--cpus", "2"]
+     # vb.customize ["modifyvm", :id, "--graphicscontroller", "vboxvga"]
+     # vb.customize ["modifyvm", :id, "--vram", "128"]
+     # Enable, if Guest Additions are installed, whether hardware 3D acceleration should be available
+     # vb.customize ["modifyvm", :id, "--accelerate3d", "on"]
+  end
+
+  config.vm.provision "shell", inline: <<-SHELL
+     yum -y update
+     yum -y install java-1.8.0-openjdk git cntlm
+		 wget -O /etc/yum.repos.d/jenkins.repo http://pkg.jenkins-ci.org/redhat/jenkins.repo
+     rpm --import https://jenkins-ci.org/redhat/jenkins-ci.org.key
+     yum -y install jenkins
+     service jenkins start
+     chkconfig jenkins on
+   SHELL
+
+
+end
+
+# pipeline plugin i jenkins?
