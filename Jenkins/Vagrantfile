@@ -26,7 +26,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.provision "shell", inline: <<-SHELL
      yum -y update
-     yum -y install java-1.8.0-openjdk git
+     yum -y install java git
      wget -O /etc/yum.repos.d/jenkins.repo http://pkg.jenkins-ci.org/redhat/jenkins.repo
      rpm --import https://jenkins-ci.org/redhat/jenkins-ci.org.key
      yum -y install jenkins
@@ -37,4 +37,4 @@ Vagrant.configure("2") do |config|
 
 end
 
-# pipeline plugin i jenkins?
+# Use BlueOcan pipeline plugin in Jenkins
