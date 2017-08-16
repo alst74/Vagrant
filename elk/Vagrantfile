@@ -1,0 +1,21 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "geerlingguy/ubuntu1604"
+  config.vm.network "forwarded_port", guest: 5601, host: 5601
+  config.vm.provider "virtualbox" do |vb|
+     vb.memory = "2048"
+   end
+   config.vm.provision "shell", inline: <<-SHELL
+    systemctl stop apparmor.service
+    update-rc.d -f apparmor remove
+    apt-get update
+    apt-get install -y ansible
+    echo -e "[elkservers]\n127.0.0.1 ansible_user=root ansible_connection=local" >> /etc/ansible/hosts
+    git clone https://github.com/DanielBerman/ansible-elk-playbook.git
+   SHELL
+end
+
+# install with: ansible-playbook main.yml 
+# kibana: localhost:5601
