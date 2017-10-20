@@ -1,0 +1,28 @@
+# -*- mode: ruby -*-
+# # vi: set ft=ruby :
+ 
+# Specify minimum Vagrant version and Vagrant API version
+Vagrant.require_version '>= 1.6.0'
+VAGRANTFILE_API_VERSION = '2'
+ 
+# Require JSON module
+require 'json'
+ 
+# Read YAML file with box details
+servers = JSON.parse(File.read(File.join(File.dirname(__FILE__), 'servers.json')))
+ 
+# Create boxes
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+ 
+  # Iterate through entries in JSON file
+  servers.each do |server|
+    config.vm.define server['name'] do |srv|
+      srv.vm.box = server['box']
+      srv.vm.network 'private_network', ip: server['ip_addr']
+      srv.vm.provider :vmware_fusion do |vmw|
+        vmw.vmx['memsize'] = server['ram']
+        vmw.vmx['numvcpus'] = server['vcpu']
+      end # srv.vm.provider
+    end # config.vm.define
+  end # servers.each
+end # Vagrant.configure
